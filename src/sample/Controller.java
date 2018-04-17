@@ -29,6 +29,61 @@ public class Controller {
 
     }
 
+    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst, String columnSecond){
+
+        toSrollPane.getChildren().clear();
+        list.clear();
+        try {
+            int y=0;
+            while (r.next()) {
+                CheckBox chB=new CheckBox(r.getString(columnFirst)+" "+r.getString(columnSecond));
+                chB.setLayoutY(y+=30);
+                list.add(chB);
+                toSrollPane.getChildren().add(chB);
+
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst){
+
+        toSrollPane.getChildren().clear();
+        list.clear();
+        try {
+            int y=0;
+            while (r.next()) {
+                CheckBox chB=new CheckBox(r.getString(columnFirst));
+                chB.setLayoutY(y+=30);
+                list.add(chB);
+                toSrollPane.getChildren().add(chB);
+
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst, String columnSecond, String columnThird){
+
+        toSrollPane.getChildren().clear();
+        list.clear();
+        try {
+            int y=0;
+            while (r.next()) {
+                CheckBox chB=new CheckBox(r.getString(columnFirst)+" "+r.getString(columnSecond)+" "+r.getString(columnThird));
+                chB.setLayoutY(y+=30);
+                list.add(chB);
+                toSrollPane.getChildren().add(chB);
+
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+    }
+
     public void wypo(ActionEvent event) {
         List<CheckBox> checkBoxes=new ArrayList<>();
         List<CheckBox> checkedBoxes=new ArrayList<>();
@@ -78,65 +133,38 @@ public class Controller {
         deleteButton.setLayoutY(100);
         deleteButton.setLayoutX(450);
 
-        r = baseData.getData("SELECT  osoby.imie, osoby.nazwisko, ksiazki.tytul from wypozyczenia " +
-                "join osoby on wypozyczenia.id_osoby=osoby.id_o " +
-                "join ksiazki on wypozyczenia.id_ksiazki=ksiazki.id;");
 
-        try {
-            int x = 0;
-            while (r.next()) {
-                CheckBox chbox = new CheckBox();
-                chbox.setLayoutY(x);
-                ArrayList<String> la=new ArrayList<>();
 
-                la.add(0,r.getString("imie").toLowerCase());
-                la.add(1,r.getString("nazwisko").toLowerCase());
-                la.add(2,r.getString("tytul").toLowerCase());
-                lista.add(la);
 
-                String i = r.getString("imie");
-                String n = r.getString("nazwisko");
-                String t = r.getString("tytul");
-
-                chbox.setText(i + " " + n + " " + t);
-                x += 40;
-                d.getChildren().add(chbox);
-                checkBoxes.add(chbox);
-
-            }
-        } catch (Exception e) {
-            System.out.println("Error "+e);
-        }
 
         searchButoon.setOnAction((ActionEvent event1) -> {
-            String ssName=null;
-            String fName=null;
-            String titlee=null;
-            ssName=sName.getText().toLowerCase();
-            fName=name.getText().toLowerCase();
-            titlee=title.getText().toLowerCase();
-            d.getChildren().clear();
+
             checkBoxes.clear();
-            int y=0;
 
-            for (List<String> lis: lista) {
+            if(sName.getText().trim().isEmpty() && name.getText().trim().isEmpty() && title.getText().trim().isEmpty()){
+                r = baseData.getData("SELECT  osoby.imie, osoby.nazwisko, ksiazki.tytul from wypozyczenia " +
+                        "join osoby on wypozyczenia.id_osoby=osoby.id_o " +
+                        "join ksiazki on wypozyczenia.id_ksiazki=ksiazki.id;");
+            }else{
+                r = baseData.getData("SELECT  o.imie, o.nazwisko, k.tytul from wypozyczenia w " +
+                        "join osoby o on w.id_osoby=o.id_o " +
+                        "join ksiazki k on w.id_ksiazki=k.id " +
+                        "where o.imie='"+name.getText()+"' or o.nazwisko='"+sName.getText()+"' or k.tytul='"+title.getText()+"' ;");
+            }
 
-                    if(ssName.equals(lis.get(1)) || fName.equals(lis.get(0))|| title.equals(lis.get(2))){
-                        CheckBox chb=new CheckBox(lis.get(0)+" "+lis.get(1)+" "+lis.get(2));
-                        chb.setLayoutY(y+=30);
-                        d.getChildren().add(chb);
-                        checkBoxes.add(chb);
-                    }
-                }
+            showScroll(checkBoxes,d,"imie","nazwisko","tytul");
 
-            System.out.println(title);
 
             System.out.println(name.getText());
             for (int i=0;i< checkBoxes.size();i++){
                 checkedBoxes.clear();
                 CheckBox chBox=checkBoxes.get(i);
                 chBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                    checkedBoxes.add(chBox);
+                    if(chBox.isSelected()) {
+                        checkedBoxes.add(chBox);
+                    }else {
+                        checkedBoxes.remove(chBox);
+                    }
                 });
             }
         });
@@ -185,7 +213,7 @@ public class Controller {
 
             Stage newWindow=new Stage();
             Pane secondPane=new Pane();
-            Scene secondScene=new Scene(secondPane,750,600);
+            Scene secondScene=new Scene(secondPane,950,600);
             Pane toSrollPane=new Pane();
             ScrollPane scrollPane1=new ScrollPane(toSrollPane);
             List<CheckBox> personsBox=new ArrayList<>();
@@ -210,65 +238,70 @@ public class Controller {
             nameTextField.setLayoutX(330);
             nameTextField.setLayoutY(200);
 
+            saershPerson.setLayoutX(330);
+            saershPerson.setLayoutY(300);
+
             scrollPane1.setPrefSize(300,400);
 
-            secondPane.getChildren().addAll(toSrollPane,nameTextField,snameTextField);
+            secondPane.getChildren().addAll(toSrollPane,nameTextField,snameTextField,saershPerson);
             secondPane.getChildren().add(scrollPane1);
 
-            try {
-                int y=0;
-                while (r.next()) {
-                    CheckBox chB=new CheckBox(r.getString("imie")+" "+r.getString("nazwisko"));
-                    chB.setLayoutY(y+=30);
-                    personsBox.add(chB);
-                    toSrollPane.getChildren().add(chB);
 
+            saershPerson.setOnAction(szuk ->{
+
+                if(nameTextField.getText().trim().isEmpty() && snameTextField.getText().trim().isEmpty()) {
+                r=baseData.getData("Select imie, nazwisko from osoby;");
+                }else {
+                    r = baseData.getData("Select imie, nazwisko from osoby where imie='" + nameTextField.getText() + "' or nazwisko='" + snameTextField.getText() + "';");
                 }
-            }
-            catch (Exception e){
-                System.out.println(e);
-            }
+               showScroll(personsBox,toSrollPane,"imie","nazwisko");
 
-            for(int i=0;i<personsBox.size();i++) {
-                CheckBox person = personsBox.get(i);
-                person.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                    Pane booksPane = new Pane();
-                    ScrollPane booksSrcollPane = new ScrollPane(booksPane);
+                for(int i=0;i<personsBox.size();i++) {
+                    CheckBox person = personsBox.get(i);
+                    person.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                        Pane booksPane = new Pane();
+                        ScrollPane booksSrcollPane = new ScrollPane(booksPane);
+
+                        if (person.isSelected()) {
+                            List<CheckBox> booksBoxes = new ArrayList<>();
+                            booksSrcollPane.setPrefSize(300, 400);
+                            booksSrcollPane.setLayoutX(310);
+                            nameTextField.clear();
+                            nameTextField.setLayoutX(630);
+                            nameTextField.setPromptText("Tytuł");
+                            personSelected.add(person);
+                            secondPane.getChildren().addAll(booksPane, booksSrcollPane);
 
 
-                    if (person.isSelected()) {
-                        List<CheckBox> booksBoxes = new ArrayList<>();
 
-                        booksSrcollPane.setPrefSize(300, 400);
-                        booksSrcollPane.setLayoutX(310);
-                        personSelected.add(person);
-                        secondPane.getChildren().addAll(booksPane, booksSrcollPane);
-                        r = baseData.getData("Select tytul from ksiazki");
+                            saershPerson.setOnAction(event2 -> {
+                                if(name.getText().trim().isEmpty()) {
+                                    r = baseData.getData("Select tytul from ksiazki");
+                                }else{
+                                    r=baseData.getData("Select from tytul from ksiazki where tytul='"+nameTextField.getText()+"';");
+                                }
+                                showScroll(booksBoxes,booksPane,"tytul");
 
-                        try {
-                            int y = 0;
-                            while (r.next()) {
-                                CheckBox chB = new CheckBox(r.getString("tytul"));
-                                chB.setLayoutY(y += 30);
-                                booksBoxes.add(chB);
-                                booksPane.getChildren().add(chB);
+                                for (CheckBox book:booksBoxes
+                                     ) {
 
+                                }
+                            });
+                        }
+                        else{
+                            personSelected.remove(person);
+                            if(personSelected.size()==0) {
+                                secondPane.getChildren().clear();
+                                nameTextField.setLayoutX(330);
+                                snameTextField.setLayoutX(330);
+                                nameTextField.setPromptText("imie");
+                                secondPane.getChildren().addAll(scrollPane1,snameTextField,nameTextField,saershPerson);
                             }
-                        } catch (Exception e) {
-                            System.out.println(e);
                         }
+                    });
+                }
 
-                    }
-                    else{
-                        personSelected.remove(person);
-                        if(personSelected.size()==0) {
-                            secondPane.getChildren().clear();
-
-                            secondPane.getChildren().add(scrollPane1);
-                        }
-                    }
-                });
-            }
+            });
 
 
         });
