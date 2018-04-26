@@ -23,6 +23,7 @@ public class AddwypWindow extends AddToScroll {
 
     public AddwypWindow(){
         super();
+
     }
     public void AddwypWindowShow(){
         Stage newWindow=new Stage();
@@ -66,7 +67,7 @@ public class AddwypWindow extends AddToScroll {
             }else {
                 r = baseData.getData("Select imie, nazwisko from osoby where imie='" + nameTextField.getText() + "' or nazwisko='" + snameTextField.getText() + "';");
             }
-            showScroll(personsBox,toSrollPane,"imie","nazwisko");
+            
 
             for(int i=0;i<personsBox.size();i++) {
                 CheckBox person = personsBox.get(i);

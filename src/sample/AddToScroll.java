@@ -1,6 +1,11 @@
 package sample;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
 
 import java.sql.ResultSet;
@@ -67,6 +72,36 @@ public class AddToScroll {
         catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    protected void showTableView(TableView<Person>  table, String fTable,String sTable, String tTable, String fname, String sname, String tname){
+        table.getColumns().clear();
+        ObservableList<Person> data= FXCollections.observableArrayList();
+        TableColumn fisrtColumn=new TableColumn(fname);
+
+        fisrtColumn.setCellValueFactory(
+        new PropertyValueFactory<Person,String>(fTable));
+
+        TableColumn secondColumn=new TableColumn(sname);
+        secondColumn.setCellValueFactory(
+                new PropertyValueFactory<Person,String>(sTable));
+
+        TableColumn thirdColumn=new TableColumn(tname);
+        thirdColumn.setCellValueFactory(
+                new PropertyValueFactory<Person,String>(tTable));
+
+        try{
+            while(r.next()){
+                data.add(new Person(r.getString(fname),r.getString(sname),r.getString(tname)));
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+        table.setItems(data);
+        table.getColumns().addAll(fisrtColumn,secondColumn,thirdColumn);
+
     }
 
 }
