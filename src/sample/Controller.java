@@ -17,72 +17,19 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-public class Controller {
-    public DatebaseConnection baseData = DatebaseConnection.getInstance();
-    private ResultSet r;
+public class Controller extends AddToScroll {
+
     @FXML
     private Pane mainPane;
     public Button wypoz;
     public  Button os;
 
     public Controller() {
-
+        super();
     }
 
-    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst, String columnSecond){
 
-        toSrollPane.getChildren().clear();
-        list.clear();
-        try {
-            int y=0;
-            while (r.next()) {
-                CheckBox chB=new CheckBox(r.getString(columnFirst)+" "+r.getString(columnSecond));
-                chB.setLayoutY(y+=30);
-                list.add(chB);
-                toSrollPane.getChildren().add(chB);
 
-            }
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst){
-
-        toSrollPane.getChildren().clear();
-        list.clear();
-        try {
-            int y=0;
-            while (r.next()) {
-                CheckBox chB=new CheckBox(r.getString(columnFirst));
-                chB.setLayoutY(y+=30);
-                list.add(chB);
-                toSrollPane.getChildren().add(chB);
-
-            }
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
-    private void showScroll(List<CheckBox> list, Pane toSrollPane,String columnFirst, String columnSecond, String columnThird){
-
-        toSrollPane.getChildren().clear();
-        list.clear();
-        try {
-            int y=0;
-            while (r.next()) {
-                CheckBox chB=new CheckBox(r.getString(columnFirst)+" "+r.getString(columnSecond)+" "+r.getString(columnThird));
-                chB.setLayoutY(y+=30);
-                list.add(chB);
-                toSrollPane.getChildren().add(chB);
-
-            }
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
 
     public void wypo(ActionEvent event) {
         List<CheckBox> checkBoxes=new ArrayList<>();
@@ -264,17 +211,23 @@ public class Controller {
 
                         if (person.isSelected()) {
                             List<CheckBox> booksBoxes = new ArrayList<>();
+                            List<CheckBox> booksCheck=new ArrayList<>();
                             booksSrcollPane.setPrefSize(300, 400);
                             booksSrcollPane.setLayoutX(310);
+                            Button add= new Button("dodaj");
+                            Button saershBooks= new Button("szukaj");
                             nameTextField.clear();
                             nameTextField.setLayoutX(630);
                             nameTextField.setPromptText("Tytuł");
                             personSelected.add(person);
-                            secondPane.getChildren().addAll(booksPane, booksSrcollPane);
+                            add.setLayoutX(630);
+                            add.setLayoutY(350);
+                            saershBooks.setLayoutY(300);
+                            saershBooks.setLayoutX(630);
+                            secondPane.getChildren().addAll(booksPane, booksSrcollPane,saershBooks,add);
 
 
-
-                            saershPerson.setOnAction(event2 -> {
+                            saershBooks.setOnAction(event2 -> {
                                 if(name.getText().trim().isEmpty()) {
                                     r = baseData.getData("Select tytul from ksiazki");
                                 }else{
@@ -284,8 +237,18 @@ public class Controller {
 
                                 for (CheckBox book:booksBoxes
                                      ) {
-
+                                        book.selectedProperty().addListener((observable1, oldValue1, newValue1) -> {
+                                            if(book.isSelected()){
+                                                booksCheck.add(book);
+                                            }
+                                            else{
+                                                booksCheck.remove(book);
+                                            }
+                                        });
                                 }
+                                add.setOnAction(event3 -> {
+
+                                });
                             });
                         }
                         else{
@@ -313,6 +276,8 @@ public class Controller {
     public void oso(ActionEvent event) {
         mainPane.getChildren().clear();
         mainPane.getChildren().addAll(os,wypoz);
+        AddwypWindow o=new AddwypWindow();
+        o.AddwypWindowShow();
 
     }
 }
