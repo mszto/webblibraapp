@@ -2,9 +2,7 @@ package sample;
 
 import java.sql.*;
 
-/**
- * Created by dkoby on 28.02.2018.
- */
+
 public class DatebaseConnection {
 
     private static DatebaseConnection instance=null;
