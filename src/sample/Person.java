@@ -10,11 +10,22 @@ public class Person {
     private final SimpleStringProperty secondName;
     private final SimpleStringProperty title;
 
-    public Person(String fName, String sName, String title){
+    Person(String fName, String sName, String title){
         this.firstName=new SimpleStringProperty(fName);
         this.secondName=new SimpleStringProperty(sName);
         this.title=new SimpleStringProperty(title);
 
+    }
+    Person(String fName, String sName){
+        this.firstName=new SimpleStringProperty(fName);
+        this.secondName=new SimpleStringProperty(sName);
+        this.title=new SimpleStringProperty(null);
+    }
+
+    Person(String titles){
+        this.title=new SimpleStringProperty(titles);
+        this.firstName=new SimpleStringProperty(null);
+        this.secondName=new SimpleStringProperty(null);
     }
 
     public String getFirstName(){

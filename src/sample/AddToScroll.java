@@ -104,4 +104,56 @@ public class AddToScroll {
 
     }
 
+    protected void showTableView(TableView<Person>  table, String fTable,String sTable, String fname, String sname){
+        table.getColumns().clear();
+        ObservableList<Person> data= FXCollections.observableArrayList();
+        TableColumn fisrtColumn=new TableColumn(fname);
+
+        fisrtColumn.setCellValueFactory(
+                new PropertyValueFactory<Person,String>(fTable));
+
+        TableColumn secondColumn=new TableColumn(sname);
+        secondColumn.setCellValueFactory(
+                new PropertyValueFactory<Person,String>(sTable));
+
+
+        try{
+            while(r.next()){
+                data.add(new Person(r.getString(fname),r.getString(sname)));
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+        table.setItems(data);
+        table.getColumns().addAll(fisrtColumn,secondColumn);
+
+    }
+
+    protected void showTableView(TableView<Person>  table, String fTable, String fname){
+        table.getColumns().clear();
+        ObservableList<Person> data= FXCollections.observableArrayList();
+        TableColumn fisrtColumn=new TableColumn(fname);
+
+        fisrtColumn.setCellValueFactory(
+                new PropertyValueFactory<Person,String>(fTable));
+
+
+
+
+        try{
+            while(r.next()){
+                data.add(new Person(r.getString(fname)));
+            }
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+        table.setItems(data);
+        table.getColumns().addAll(fisrtColumn);
+
+    }
+
 }
