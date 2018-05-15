@@ -11,9 +11,7 @@ import javafx.scene.layout.Pane;
 import java.sql.ResultSet;
 import java.util.List;
 
-/**
- * Created by dkoby on 26.04.2018.
- */
+
 public class AddToScroll {
     ResultSet r;
     DatebaseConnection baseData;
@@ -138,8 +136,6 @@ public class AddToScroll {
 
         fisrtColumn.setCellValueFactory(
                 new PropertyValueFactory<Person,String>(fTable));
-
-
 
 
         try{

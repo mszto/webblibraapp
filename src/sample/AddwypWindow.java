@@ -1,5 +1,6 @@
 package sample;
 
+import com.sun.org.apache.bcel.internal.generic.Select;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,9 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by dkoby on 26.04.2018.
- */
+
 public class AddwypWindow extends AddToScroll {
 
     // private ResultSet r;
@@ -27,10 +26,13 @@ public class AddwypWindow extends AddToScroll {
     }
 
     public void AddwypWindowShow() {
+        Button showBooks=new Button(">");
+        Button hideBooks= new Button("<");
         Stage newWindow = new Stage();
         Pane secondPane = new Pane();
         Scene secondScene = new Scene(secondPane, 950, 600);
         TableView persons=new TableView();
+        TableView books=new TableView();
         TextField nameTextField = new TextField();
         TextField snameTextField = new TextField();
         Button saershPerson = new Button("szukaj");
@@ -41,6 +43,14 @@ public class AddwypWindow extends AddToScroll {
         newWindow.setY(100);
         newWindow.setScene(secondScene);
         newWindow.show();
+
+        persons.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        showBooks.setLayoutX(270);
+        showBooks.setLayoutY(200);
+
+        hideBooks.setLayoutY(235);
+        hideBooks.setLayoutX(270);
 
         snameTextField.setPromptText("nazwisko");
         snameTextField.setLayoutY(240);
@@ -54,7 +64,8 @@ public class AddwypWindow extends AddToScroll {
         saershPerson.setLayoutY(300);
 
         showTableView(persons,"firstName","secondName","imie","nazwisko");
-        secondPane.getChildren().addAll(nameTextField, snameTextField, saershPerson,persons);
+        secondPane.getChildren().addAll(nameTextField, snameTextField, saershPerson,persons,showBooks,hideBooks);
+
 
         saershPerson.setOnAction(szuk -> {
 
@@ -66,41 +77,97 @@ public class AddwypWindow extends AddToScroll {
 
             showTableView(persons,"firstName","secondName","imie","nazwisko");
 
-
-                TableView books=new TableView();
                 Button add = new Button("dodaj");
                 Button saershBooks = new Button("szukaj");
-                nameTextField.clear();
-                nameTextField.setLayoutX(630);
-                nameTextField.setPromptText("Tytuł");
+
 
                 add.setLayoutX(630);
                 add.setLayoutY(350);
                 saershBooks.setLayoutY(300);
                 saershBooks.setLayoutX(630);
-                books.setLayoutX(300);
+
                 add.setDisable(true);
-                showTableView(books,"title","tytuł");
 
-                secondPane.getChildren().addAll(saershBooks, add,books);
+                persons.setOnMouseClicked(event -> {
+                    if(! persons.getSelectionModel().isEmpty()){
+                        secondPane.getChildren().add(books);
+                        nameTextField.clear();
+                        nameTextField.setLayoutX(630);
+                        nameTextField.setPromptText("Tytuł");
+                        books.setLayoutX(300);
+                        showTableView(books,"title","tytul");
+                        secondPane.getChildren().addAll(saershBooks, add);
+                    }else{
+                        secondPane.getChildren().removeAll(books,add,saershBooks);
+                        nameTextField.clear();
+                        nameTextField.setPromptText("imie");
+                        nameTextField.setLayoutX(330);
+                    }
+                });
 
 
-                saershBooks.setOnAction((ActionEvent event2) -> {
+                saershBooks.setOnAction( event2 -> {
                     if (nameTextField.getText().trim().isEmpty()) {
                         r = baseData.getData("Select tytul from ksiazki");
                     } else {
                         r = baseData.getData("Select  tytul from ksiazki where tytul='" + nameTextField.getText() + "';");
                     }
-                    secondPane.getChildren().addAll(saershBooks, add,books);
 
-                    if(books.getSelectionModel().isEmpty()){
-                        add.setDisable(false);
-                    }
-
-                });
+                    showTableView(books,"title","tytul");
 
 
+                    });
 
+                     books.setOnMouseClicked(event -> {
+                         if(!books.getSelectionModel().isEmpty()){
+                             add.setDisable(false);
+                         }else{
+                             add.setDisable(true);
+                         }
+                     });
+
+                     add.setOnAction(event -> {
+                         if(!books.getSelectionModel().isEmpty() && !persons.getSelectionModel().isEmpty()){
+
+
+                             ObservableList<Person> people=persons.getSelectionModel().getSelectedItems();
+                             ObservableList<Person> boks=books.getSelectionModel().getSelectedItems();
+
+                             for (Person p:people) {
+                                 for (Person b:boks) {
+                                     StringBuilder query=new StringBuilder("Select id_o from osoby where nazwisko='");
+                                     query.append(p.getSecondName());
+                                     query.append("' and imie='");
+                                     query.append(p.getFirstName()+"'");
+                                     r=baseData.getData(query.toString());
+                                     int idO=-1;
+                                     int idB=-1;
+                                     try {
+                                         r.next();
+                                         idO=r.getInt("id_o");
+                                     } catch (SQLException e) {
+                                         e.printStackTrace();
+                                     }
+
+                                     query=new StringBuilder("Select id from ksiazki where tytul='");
+                                     query.append(b.getTitle()+"'");
+                                     r=baseData.getData(query.toString());
+
+                                     try {
+                                         r.next();
+                                          idB=r.getInt("id");
+                                     } catch (SQLException e) {
+                                         e.printStackTrace();
+                                     }
+
+                                     if(idO>-1 && idB>-1)
+                                     baseData.inserInto("insert into wypozyczenia (id_ksiazki, id_osoby) values(?, ?);",idB,idO);
+
+                                     secondScene.getWindow().hide();
+                                 }
+                             }
+                         }
+                     });
 
 
 

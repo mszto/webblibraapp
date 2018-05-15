@@ -2,9 +2,7 @@ package sample;
 
 import javafx.beans.property.SimpleStringProperty;
 
-/**
- * Created by dkoby on 26.04.2018.
- */
+
 public class Person {
     private final SimpleStringProperty firstName;
     private final SimpleStringProperty secondName;

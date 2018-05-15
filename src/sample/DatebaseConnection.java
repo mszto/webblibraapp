@@ -53,6 +53,19 @@ public class DatebaseConnection {
         catch (Exception e){
             System.out.println(e);
         }
+
+    }
+    public void inserInto(String x, int f, int s){
+        try {
+            PreparedStatement stat=con.prepareStatement(x);
+            stat.setInt(1,f);
+            stat.setInt(2,s);
+            stat.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

@@ -108,7 +108,8 @@ public class Controller extends AddToScroll {
                 baseData.delteWyp("DELETE w from wypozyczenia w " +
                         "join osoby o on o.id_o=w.id_osoby " +
                         "join ksiazki k on k.id=w.id_ksiazki " +
-                        "WHERE o.imie= ? and o.nazwisko= ? and k.tytul= ?", p.getFirstName(), p.getSecondName(), p.getSecondName());
+                        "WHERE o.imie= ? and o.nazwisko= ? and k.tytul= ?", p.getFirstName(), p.getSecondName(), p.getTitle());
+                showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul");
             }
 
         });
