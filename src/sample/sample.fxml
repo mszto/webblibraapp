@@ -6,6 +6,6 @@
 <Pane fx:id="mainPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
       <Button fx:id="wypoz" layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#wypo" text="Wypożyczenia" />
-      <Button fx:id="os" layoutX="143.0" layoutY="6.0" mnemonicParsing="false" onAction="#oso" text="Button" />
+      <Button fx:id="os" layoutX="143.0" layoutY="6.0" mnemonicParsing="false" onAction="#oso" text="Osoby" />
    </children>
 </Pane>

@@ -63,7 +63,7 @@ public class AddwypWindow extends AddToScroll {
         saershPerson.setLayoutX(330);
         saershPerson.setLayoutY(300);
 
-        showTableView(persons,"firstName","secondName","imie","nazwisko");
+        showTableView(persons,"firstName","secondName","imie","nazwisko",new Borrows());
         secondPane.getChildren().addAll(nameTextField, snameTextField, saershPerson,persons,showBooks,hideBooks);
 
 
@@ -75,11 +75,11 @@ public class AddwypWindow extends AddToScroll {
                 r = baseData.getData("Select imie, nazwisko from osoby where imie='" + nameTextField.getText() + "' or nazwisko='" + snameTextField.getText() + "';");
             }
 
-            showTableView(persons,"firstName","secondName","imie","nazwisko");
+            showTableView(persons,"firstName","secondName","imie","nazwisko",new Borrows());
 
                 Button add = new Button("dodaj");
                 Button saershBooks = new Button("szukaj");
-
+                books.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
                 add.setLayoutX(630);
                 add.setLayoutY(350);
@@ -90,12 +90,12 @@ public class AddwypWindow extends AddToScroll {
 
                 persons.setOnMouseClicked(event -> {
                     if(! persons.getSelectionModel().isEmpty()){
-                        secondPane.getChildren().add(books);
                         nameTextField.clear();
                         nameTextField.setLayoutX(630);
                         nameTextField.setPromptText("Tytuł");
                         books.setLayoutX(300);
-                        showTableView(books,"title","tytul");
+                        showTableView(books,"title","tytul",new Borrows());
+                        secondPane.getChildren().add(books);
                         secondPane.getChildren().addAll(saershBooks, add);
                     }else{
                         secondPane.getChildren().removeAll(books,add,saershBooks);
@@ -113,7 +113,7 @@ public class AddwypWindow extends AddToScroll {
                         r = baseData.getData("Select  tytul from ksiazki where tytul='" + nameTextField.getText() + "';");
                     }
 
-                    showTableView(books,"title","tytul");
+                    showTableView(books,"title","tytul", new Borrows());
 
 
                     });
@@ -130,24 +130,27 @@ public class AddwypWindow extends AddToScroll {
                          if(!books.getSelectionModel().isEmpty() && !persons.getSelectionModel().isEmpty()){
 
 
-                             ObservableList<Person> people=persons.getSelectionModel().getSelectedItems();
-                             ObservableList<Person> boks=books.getSelectionModel().getSelectedItems();
+                             ObservableList<Borrows> people=persons.getSelectionModel().getSelectedItems();
+                             ObservableList<Borrows> boks=books.getSelectionModel().getSelectedItems();
 
-                             for (Person p:people) {
-                                 for (Person b:boks) {
-                                     StringBuilder query=new StringBuilder("Select id_o from osoby where nazwisko='");
-                                     query.append(p.getSecondName());
-                                     query.append("' and imie='");
-                                     query.append(p.getFirstName()+"'");
-                                     r=baseData.getData(query.toString());
-                                     int idO=-1;
-                                     int idB=-1;
-                                     try {
-                                         r.next();
-                                         idO=r.getInt("id_o");
-                                     } catch (SQLException e) {
-                                         e.printStackTrace();
-                                     }
+                             for (Borrows p:people) {
+
+                                 StringBuilder query=new StringBuilder("Select id_o from osoby where nazwisko='");
+                                 query.append(p.getSecondName());
+                                 query.append("' and imie='");
+                                 query.append(p.getFirstName()+"'");
+                                 r=baseData.getData(query.toString());
+                                 int idO=-1;
+                                 int idB=-1;
+                                 try {
+                                     r.next();
+                                     idO=r.getInt("id_o");
+                                 } catch (SQLException e) {
+                                     e.printStackTrace();
+                                 }
+
+                                 for (Borrows b:boks) {
+
 
                                      query=new StringBuilder("Select id from ksiazki where tytul='");
                                      query.append(b.getTitle()+"'");

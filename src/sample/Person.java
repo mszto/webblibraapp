@@ -1,60 +1,89 @@
 package sample;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
+public class Person implements Data{
 
-public class Person {
-    private final SimpleStringProperty firstName;
-    private final SimpleStringProperty secondName;
-    private final SimpleStringProperty title;
+    private final SimpleStringProperty sName;
+    private final SimpleStringProperty fName;
+    private final SimpleIntegerProperty id;
 
-    Person(String fName, String sName, String title){
-        this.firstName=new SimpleStringProperty(fName);
-        this.secondName=new SimpleStringProperty(sName);
-        this.title=new SimpleStringProperty(title);
+    public Person() {
 
-    }
-    Person(String fName, String sName){
-        this.firstName=new SimpleStringProperty(fName);
-        this.secondName=new SimpleStringProperty(sName);
-        this.title=new SimpleStringProperty(null);
+        id = null;
+        fName = null;
+        sName = null;
     }
 
-    Person(String titles){
-        this.title=new SimpleStringProperty(titles);
-        this.firstName=new SimpleStringProperty(null);
-        this.secondName=new SimpleStringProperty(null);
+    public String getfName() {
+        return fName.get();
     }
 
-    public String getFirstName(){
-        return firstName.get();
+    public SimpleStringProperty fNameProperty() {
+        return fName;
     }
 
-    public void setFirstName(String fname){
-        this.firstName.set(fname);
+    public void setfName(String fName) {
+        this.fName.set(fName);
     }
 
-    public String getSecondName() {
-        return secondName.get();
+
+
+    public String getsName() {
+        return sName.get();
     }
 
-    public SimpleStringProperty secondNameProperty() {
-        return secondName;
+    public SimpleStringProperty sNameProperty() {
+        return sName;
     }
 
-    public void setSecondName(String secondName) {
-        this.secondName.set(secondName);
+    public void setsName(String sName) {
+        this.sName.set(sName);
     }
 
-    public String getTitle() {
-        return title.get();
+
+
+    public int getId() {
+        return id.get();
     }
 
-    public SimpleStringProperty titleProperty() {
-        return title;
+    public SimpleIntegerProperty idProperty() {
+        return id;
     }
 
-    public void setTitle(String title) {
-        this.title.set(title);
+    public void setId(int id) {
+        this.id.set(id);
     }
+
+
+
+    public Person(String fName, String sName, int id) {
+        this.fName = new SimpleStringProperty(fName);
+        this.sName = new SimpleStringProperty(sName);
+        this.id = new SimpleIntegerProperty(id);
+    }
+
+
+    @Override
+    public Data createData(String fName, String sName, String title) {
+        return null;
+    }
+
+    @Override
+    public Data createData(String fName, String sName) {
+        return null;
+    }
+
+    @Override
+    public Data createData(String fName) {
+        return null;
+    }
+
+    @Override
+    public Person createData(String fName, String sName, int id) {
+        return new Person(fName, sName,id);
+    }
+
+
 }

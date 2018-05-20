@@ -4,10 +4,12 @@ package sample;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 
 import javafx.stage.Stage;
@@ -36,8 +38,8 @@ public class Controller extends AddToScroll {
 
 
     public void wypo(ActionEvent event) {
-
-        TableView<Person> tablePerson = new TableView<>();
+        mainPane.getChildren().clear();
+        TableView<Borrows> tablePerson = new TableView<>();
 
         TextField name = new TextField();
         TextField sName = new TextField();
@@ -55,9 +57,10 @@ public class Controller extends AddToScroll {
         mainPane.getChildren().add(title);
         mainPane.getChildren().add(deleteButton);
         mainPane.getChildren().add(addButton);
-        mainPane.getChildren().add(tablePerson);
+        mainPane.getChildren().addAll(tablePerson,os,wypoz);
 
         tablePerson.setMinSize(400, 900);
+        tablePerson.setLayoutY(50);
 
         sName.setPromptText("nazwisko");
         sName.setLayoutY(240);
@@ -79,7 +82,7 @@ public class Controller extends AddToScroll {
 
         deleteButton.setLayoutY(100);
         deleteButton.setLayoutX(450);
-        showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul");
+        showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
 
 
         searchButoon.setOnAction((ActionEvent event1) -> {
@@ -96,20 +99,20 @@ public class Controller extends AddToScroll {
                         "where o.imie='" + name.getText() + "' or o.nazwisko='" + sName.getText() + "' or k.tytul='" + title.getText() + "' ;");
             }
 
-            showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul");
+            showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
 
         });
 
         deleteButton.setOnAction(event1 -> {
-            ObservableList<Person> list;
+            ObservableList<Borrows> list;
             list = tablePerson.getSelectionModel().getSelectedItems();
 
-            for (Person p : list) {
+            for (Borrows p : list) {
                 baseData.delteWyp("DELETE w from wypozyczenia w " +
                         "join osoby o on o.id_o=w.id_osoby " +
                         "join ksiazki k on k.id=w.id_ksiazki " +
                         "WHERE o.imie= ? and o.nazwisko= ? and k.tytul= ?", p.getFirstName(), p.getSecondName(), p.getTitle());
-                showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul");
+                showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
             }
 
         });
@@ -125,10 +128,52 @@ public class Controller extends AddToScroll {
     public void oso(ActionEvent event) {
         mainPane.getChildren().clear();
         mainPane.getChildren().addAll(os,wypoz);
-        ListView<Label> list=new ListView<>();
-        AddwypWindow o=new AddwypWindow();
-        o.AddwypWindowShow();
-        TableView tableView=new TableView();
+        TableView<Person> personsTable=new TableView<>();
+        TextField name = new TextField();
+        TextField sName = new TextField();
+        TextField addName = new TextField();
+        TextField addsName = new TextField();
+        Button searchPerson=new Button("Szukaj");
+        Button addPerson= new Button("Dodaj");
+
+        sName.setPromptText("nazwisko");
+        sName.setLayoutY(240);
+        sName.setLayoutX(500);
+
+        name.setPromptText("imie");
+        name.setLayoutX(500);
+        name.setLayoutY(200);
+
+        addsName.setPromptText("nazwisko");
+        addsName.setLayoutY(600);
+
+
+        addName.setPromptText("imie");
+        addName.setLayoutX(200);
+        addName.setLayoutY(600);
+
+        addPerson.setLayoutY(600);
+        addPerson.setLayoutX(400);
+
+        searchPerson.setLayoutX(500);
+        searchPerson.setLayoutY(300);
+
+        personsTable.setMinSize(300,500);
+        personsTable.setLayoutY(50);
+        personsTable.setEditable(true);
+
+        showTableViewEdit(personsTable,"fName","sName","id","imię","nazwisko","id_o",new Person());
+        mainPane.getChildren().addAll(personsTable,searchPerson,name,sName,addName,addsName,addPerson);
+        searchPerson.setOnAction((ActionEvent event1) -> {
+            if (name.getText().trim().isEmpty() && sName.getText().trim().isEmpty()) {
+                r = baseData.getData("Select imie, nazwisko, id_o from osoby;");
+            } else {
+                r = baseData.getData("Select imie, nazwisko, id_o from osoby where imie='" + name.getText() + "' or nazwisko='" + sName.getText() + "';");
+            }
+
+
+            showTableViewEdit(personsTable,"fName","sName","id","imie","nazwisko","id_o",new Person());
+        });
 
 
     }
