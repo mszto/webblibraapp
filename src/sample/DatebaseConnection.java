@@ -55,6 +55,17 @@ public class DatebaseConnection {
         }
 
     }
+    public void delteWyp(String x, int first){
+        try {
+            PreparedStatement stat= con.prepareStatement(x);
+            stat.setInt(1,first);
+            stat.executeUpdate();
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
+
+    }
     public void inserInto(String x, int f, int s){
         try {
             PreparedStatement stat=con.prepareStatement(x);
@@ -66,6 +77,30 @@ public class DatebaseConnection {
             e.printStackTrace();
         }
 
+    }
+    public void inserInto(String x, String f, String s){
+        try {
+            PreparedStatement stat=con.prepareStatement(x);
+            stat.setString(1,f);
+            stat.setString(2,s);
+            stat.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void UpdatedString(String x, String f, int id) {
+        try {
+            PreparedStatement stat = con.prepareStatement(x);
+            stat.setString(1, f);
+            stat.setInt(2,id);
+            stat.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 

@@ -11,6 +11,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 
@@ -22,15 +23,16 @@ public class AddToScroll<K,E,D>   {
     }
 
 
-    protected void showTableView(TableView<Data>  table, String fTable,String sTable, String tTable, String fname, String sname, String tname, Data d){
+    protected void showTableView(TableView<Data>  table, String fTable,String sTable, String tTable, String fname, String sname, String tname, Data d)  {
         table.getColumns().clear();
         ObservableList<Data> data= FXCollections.observableArrayList();
         TableColumn fisrtColumn=new TableColumn(fname);
-
+        fisrtColumn.setMinWidth(150);
         fisrtColumn.setCellValueFactory(
         new PropertyValueFactory<Data,K>(fTable));
 
         TableColumn secondColumn=new TableColumn(sname);
+        secondColumn.setMinWidth(150);
         secondColumn.setCellValueFactory(
                 new PropertyValueFactory<Data,D>(sTable));
 
@@ -41,15 +43,20 @@ public class AddToScroll<K,E,D>   {
 
         try{
             while(r.next()){
-                if(r.getString(tname).isEmpty()) {
-                    data.add(d.createData(r.getString(fname), r.getString(sname), r.getString(tname)));
-                }else{
                     data.add(d.createData(r.getString(fname), r.getString(sname), r.getInt(tname)));
-                }
             }
         }
         catch (Exception e){
-            System.out.println(e);
+            try {
+                data.add(d.createData(r.getString(fname), r.getString(sname), r.getString(tname)));
+                while(r.next()){
+                    data.add(d.createData(r.getString(fname), r.getString(sname), r.getString(tname)));
+                }
+            } catch (Exception e1) {
+                System.out.println(e1);
+            }
+            System.out.println(e+" line 55 in class AddToScroll");
+
         }
 
         table.setItems(data);
@@ -122,10 +129,14 @@ public class AddToScroll<K,E,D>   {
 
         fisrtColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
+
         fisrtColumn.setOnEditCommit(new EventHandler<TableColumn.CellEditEvent<Person,String>>() {
             @Override
             public void handle(TableColumn.CellEditEvent<Person,String> t) {
                 t.getTableView().getItems().get(t.getTablePosition().getRow()).setfName(t.getNewValue());
+                int id=t.getTableView().getItems().get(t.getTablePosition().getRow()).getId();
+
+                baseData.UpdatedString("Update osoby set imie=? where id_o=?",t.getNewValue(),id);
             }
         });
 
@@ -139,6 +150,9 @@ public class AddToScroll<K,E,D>   {
             @Override
             public void handle(TableColumn.CellEditEvent<Person,String> t) {
                 t.getTableView().getItems().get(t.getTablePosition().getRow()).setsName(t.getNewValue());
+                int id=t.getTableView().getItems().get(t.getTablePosition().getRow()).getId();
+
+                baseData.UpdatedString("Update osoby set nazwisko=? where id_o=?",t.getNewValue(),id);
             }
         });
 
@@ -148,8 +162,9 @@ public class AddToScroll<K,E,D>   {
 
 
         try{
+
             while(r.next()){
-                data.add(d.createData(r.getString(fname),r.getString(sname)));
+                data.add(d.createData(r.getString(fname),r.getString(sname),r.getInt(tname)));
             }
         }
         catch (Exception e){

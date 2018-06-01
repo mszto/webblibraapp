@@ -115,7 +115,6 @@ public class AddwypWindow extends AddToScroll {
 
                     showTableView(books,"title","tytul", new Borrows());
 
-
                     });
 
                      books.setOnMouseClicked(event -> {

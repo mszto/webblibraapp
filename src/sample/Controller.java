@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.sql.ResultSet;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -25,7 +27,7 @@ public class Controller extends AddToScroll {
     @FXML
     private Pane mainPane;
     public Button wypoz;
-    public  Button os;
+    public  Button os,showBooksButton;
     public ListView<Label> listView;
 
     public Controller() {
@@ -33,8 +35,6 @@ public class Controller extends AddToScroll {
         super();
 
     }
-
-
 
 
     public void wypo(ActionEvent event) {
@@ -48,6 +48,7 @@ public class Controller extends AddToScroll {
         Button deleteButton = new Button("usun");
         Button addButton = new Button("Dodaj");
 
+
         tablePerson.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         mainPane.getChildren().removeAll();
@@ -57,7 +58,7 @@ public class Controller extends AddToScroll {
         mainPane.getChildren().add(title);
         mainPane.getChildren().add(deleteButton);
         mainPane.getChildren().add(addButton);
-        mainPane.getChildren().addAll(tablePerson,os,wypoz);
+        mainPane.getChildren().addAll(tablePerson,os,wypoz,showBooksButton);
 
         tablePerson.setMinSize(400, 900);
         tablePerson.setLayoutY(50);
@@ -112,8 +113,8 @@ public class Controller extends AddToScroll {
                         "join osoby o on o.id_o=w.id_osoby " +
                         "join ksiazki k on k.id=w.id_ksiazki " +
                         "WHERE o.imie= ? and o.nazwisko= ? and k.tytul= ?", p.getFirstName(), p.getSecondName(), p.getTitle());
-                showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
             }
+            showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
 
         });
 
@@ -127,12 +128,13 @@ public class Controller extends AddToScroll {
 
     public void oso(ActionEvent event) {
         mainPane.getChildren().clear();
-        mainPane.getChildren().addAll(os,wypoz);
+        mainPane.getChildren().addAll(os,wypoz,showBooksButton);
         TableView<Person> personsTable=new TableView<>();
         TextField name = new TextField();
         TextField sName = new TextField();
         TextField addName = new TextField();
         TextField addsName = new TextField();
+        Button deletePerson=new Button("Usuń");
         Button searchPerson=new Button("Szukaj");
         Button addPerson= new Button("Dodaj");
 
@@ -162,7 +164,12 @@ public class Controller extends AddToScroll {
         personsTable.setLayoutY(50);
         personsTable.setEditable(true);
 
+        deletePerson.setDisable(true);
+
+
         showTableViewEdit(personsTable,"fName","sName","id","imię","nazwisko","id_o",new Person());
+
+
         mainPane.getChildren().addAll(personsTable,searchPerson,name,sName,addName,addsName,addPerson);
         searchPerson.setOnAction((ActionEvent event1) -> {
             if (name.getText().trim().isEmpty() && sName.getText().trim().isEmpty()) {
@@ -171,10 +178,87 @@ public class Controller extends AddToScroll {
                 r = baseData.getData("Select imie, nazwisko, id_o from osoby where imie='" + name.getText() + "' or nazwisko='" + sName.getText() + "';");
             }
 
-
             showTableViewEdit(personsTable,"fName","sName","id","imie","nazwisko","id_o",new Person());
         });
 
+        personsTable.setOnMouseClicked(clikedTable->{
+            deletePerson.setDisable(false);
+        });
 
+        addPerson.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                int id=-1;
+                baseData.inserInto("insert into osoby (imie, nazwisko) values(?,?);",addName.getText(), addsName.getText());
+                r=baseData.getData("Select id_o from osoby where imie='"+addName.getText()+"' and nazwisko='"+addsName.getText()+"';");
+                try {
+                    id=r.getInt("id_o");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                personsTable.getItems().add(new Person(addName.getText(),addsName.getText(),id));
+                addName.clear();
+                addsName.clear();
+
+            }
+        });
+
+        deletePerson.setOnAction(deletePersonEvent ->{
+            ObservableList<Person> list;
+            list = personsTable.getSelectionModel().getSelectedItems();
+
+            for (Person p : list) {
+                baseData.delteWyp("DELETE o from osoby o " +
+                        "WHERE o.id_0= ?",p.getId());
+            }
+            showTableView(personsTable, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
+        });
+
+    }
+
+    public void books(ActionEvent event){
+        TableView<Person> booksTable=new TableView();
+        mainPane.getChildren().clear();
+        mainPane.getChildren().addAll(os,wypoz,showBooksButton);
+
+        mainPane.getChildren().clear();
+        mainPane.getChildren().addAll(os,wypoz,showBooksButton);
+
+        TextField title = new TextField();
+
+        Button searchBook=new Button("Szukaj");
+        Button addBook= new Button("Dodaj");
+
+
+        title.setPromptText("Tytuł");
+        title.setLayoutX(500);
+        title.setLayoutY(200);
+
+
+        addBook.setLayoutY(600);
+        addBook.setLayoutX(400);
+
+        searchBook.setLayoutX(500);
+        searchBook.setLayoutY(300);
+
+        booksTable.setMinSize(500,500);
+        booksTable.setLayoutY(50);
+        booksTable.setEditable(true);
+
+
+        showTableViewEdit(booksTable,"fName","sName","id","tytuł","autor","id_ksiazki",new Person());
+
+
+        mainPane.getChildren().addAll(booksTable,title,searchBook,addBook);
+        searchBook.setOnAction((ActionEvent event1) -> {
+            if (title.getText().trim().isEmpty()) {
+                r = baseData.getData("Select k.tytul, k.id as id_ksiazki, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a where k.id_autor=a.id_autor ");
+            } else {
+                r = baseData.getData("Select k.tytul, k.id as id_ksiazki, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a where k.id_autor=a.id_autor where imie='" + title.getText() + "'");
+            }
+
+            showTableView(booksTable,"fName","sName","id","tytul","autor","id_ksiazki",new Person());
+
+    });
     }
 }
