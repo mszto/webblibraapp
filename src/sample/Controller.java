@@ -3,24 +3,12 @@ package sample;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.Pane;
-
-import javafx.stage.Stage;
-
-import java.sql.ResultSet;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
 
-import java.util.List;
 
 public class Controller extends AddToScroll {
 
@@ -113,8 +101,8 @@ public class Controller extends AddToScroll {
                         "join osoby o on o.id_o=w.id_osoby " +
                         "join ksiazki k on k.id=w.id_ksiazki " +
                         "WHERE o.imie= ? and o.nazwisko= ? and k.tytul= ?", p.getFirstName(), p.getSecondName(), p.getTitle());
+                tablePerson.getItems().removeIf(borrows -> {return borrows.equals(p);});
             }
-            showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
 
         });
 
@@ -137,6 +125,10 @@ public class Controller extends AddToScroll {
         Button deletePerson=new Button("Usuń");
         Button searchPerson=new Button("Szukaj");
         Button addPerson= new Button("Dodaj");
+
+
+        deletePerson.setLayoutX(400);
+        deletePerson.setLayoutY(50);
 
         sName.setPromptText("nazwisko");
         sName.setLayoutY(240);
@@ -166,11 +158,12 @@ public class Controller extends AddToScroll {
 
         deletePerson.setDisable(true);
 
+        personsTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         showTableViewEdit(personsTable,"fName","sName","id","imię","nazwisko","id_o",new Person());
 
 
-        mainPane.getChildren().addAll(personsTable,searchPerson,name,sName,addName,addsName,addPerson);
+        mainPane.getChildren().addAll(personsTable,searchPerson,name,sName,addName,addsName,addPerson,deletePerson);
         searchPerson.setOnAction((ActionEvent event1) -> {
             if (name.getText().trim().isEmpty() && sName.getText().trim().isEmpty()) {
                 r = baseData.getData("Select imie, nazwisko, id_o from osoby;");
@@ -182,7 +175,11 @@ public class Controller extends AddToScroll {
         });
 
         personsTable.setOnMouseClicked(clikedTable->{
-            deletePerson.setDisable(false);
+            if(personsTable.getSelectionModel().isEmpty()) {
+                deletePerson.setDisable(true);
+            }else{
+                deletePerson.setDisable(false);
+            }
         });
 
         addPerson.setOnAction(new EventHandler<ActionEvent>() {
@@ -209,9 +206,9 @@ public class Controller extends AddToScroll {
 
             for (Person p : list) {
                 baseData.delteWyp("DELETE o from osoby o " +
-                        "WHERE o.id_0= ?",p.getId());
+                        "WHERE o.id_o= ?",p.getId());
+                personsTable.getItems().removeIf(person -> {return person.equals(p);});
             }
-            showTableView(personsTable, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
         });
 
     }
@@ -225,6 +222,7 @@ public class Controller extends AddToScroll {
         mainPane.getChildren().addAll(os,wypoz,showBooksButton);
 
         TextField title = new TextField();
+        TextField addTitle= new TextField();
 
         Button searchBook=new Button("Szukaj");
         Button addBook= new Button("Dodaj");
@@ -234,6 +232,9 @@ public class Controller extends AddToScroll {
         title.setLayoutX(500);
         title.setLayoutY(200);
 
+        addTitle.setPromptText("Tytuł");
+        addTitle.setLayoutX(200);
+        addTitle.setLayoutY(600);
 
         addBook.setLayoutY(600);
         addBook.setLayoutX(400);
@@ -246,10 +247,11 @@ public class Controller extends AddToScroll {
         booksTable.setEditable(true);
 
 
+
         showTableViewEdit(booksTable,"fName","sName","id","tytuł","autor","id_ksiazki",new Person());
 
 
-        mainPane.getChildren().addAll(booksTable,title,searchBook,addBook);
+        mainPane.getChildren().addAll(booksTable,title,searchBook,addBook,addTitle);
         searchBook.setOnAction((ActionEvent event1) -> {
             if (title.getText().trim().isEmpty()) {
                 r = baseData.getData("Select k.tytul, k.id as id_ksiazki, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a where k.id_autor=a.id_autor ");
@@ -260,5 +262,8 @@ public class Controller extends AddToScroll {
             showTableView(booksTable,"fName","sName","id","tytul","autor","id_ksiazki",new Person());
 
     });
+        addBook.setOnAction((ActionEvent a)->{
+            Authors authors=new Authors(addTitle.getText(),booksTable);
+        });
     }
 }
