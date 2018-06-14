@@ -16,6 +16,18 @@ public class Person implements Data{
         sName = null;
     }
 
+    public Person(String fName, String sName) {
+        this.fName=new SimpleStringProperty(fName);
+        this.sName=new SimpleStringProperty(sName);
+        id=null;
+    }
+
+    public Person(String fName, int sName) {
+        this.id=new SimpleIntegerProperty(sName);
+        this.fName=new SimpleStringProperty(fName);
+        this.sName=null;
+    }
+
     public String getfName() {
         return fName.get();
     }
@@ -72,7 +84,12 @@ public class Person implements Data{
 
     @Override
     public Data createData(String fName, String sName) {
-        return null;
+        return new Person(fName,sName);
+    }
+
+    @Override
+    public Data createData(String fName, int sName) {
+        return new Person(fName,sName);
     }
 
     @Override

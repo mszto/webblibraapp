@@ -91,6 +91,20 @@ public class DatebaseConnection {
 
     }
 
+    public void inserInto(String x, String f, int s,int t){
+        try {
+            PreparedStatement stat=con.prepareStatement(x);
+            stat.setString(1,f);
+            stat.setInt(2,s);
+            stat.setInt(3,s);
+            stat.execute();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void UpdatedString(String x, String f, int id) {
         try {
             PreparedStatement stat = con.prepareStatement(x);

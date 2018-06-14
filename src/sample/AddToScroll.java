@@ -27,16 +27,17 @@ public class AddToScroll<K,E,D>   {
         table.getColumns().clear();
         ObservableList<Data> data= FXCollections.observableArrayList();
         TableColumn fisrtColumn=new TableColumn(fname);
-        fisrtColumn.setMinWidth(150);
+        fisrtColumn.setMaxWidth(150);
         fisrtColumn.setCellValueFactory(
         new PropertyValueFactory<Data,K>(fTable));
 
         TableColumn secondColumn=new TableColumn(sname);
-        secondColumn.setMinWidth(150);
+        secondColumn.setMaxWidth(150);
         secondColumn.setCellValueFactory(
                 new PropertyValueFactory<Data,D>(sTable));
 
         TableColumn thirdColumn=new TableColumn(tname);
+        thirdColumn.setMaxWidth(150);
         thirdColumn.setCellValueFactory(
                 new PropertyValueFactory<Data,E>(tTable));
 
@@ -64,6 +65,13 @@ public class AddToScroll<K,E,D>   {
 
     }
 
+    protected void addColumnString(TableView<Data> table, String columnName, String dataName, Data d){
+        TableColumn column=new TableColumn(columnName);
+
+        column.setCellValueFactory(new PropertyValueFactory<Data,String>(dataName));
+        table.getColumns().addAll(column);
+    }
+
     protected void showTableView(TableView<Data>  table, String fTable,String sTable, String fname, String sname,Data d){
         table.getColumns().clear();
         ObservableList<Data> data= FXCollections.observableArrayList();
@@ -80,14 +88,16 @@ public class AddToScroll<K,E,D>   {
         try{
             while(r.next()){
                 data.add(d.createData(r.getString(fname),r.getString(sname)));
+                //System.out.println(r.getString(fname)+" "+ r.getInt(sname));
             }
         }
         catch (Exception e){
+
             System.out.println(e);
         }
 
-        table.setItems(data);
         table.getColumns().addAll(fisrtColumn,secondColumn);
+        table.setItems(data);
 
     }
 
@@ -175,5 +185,37 @@ public class AddToScroll<K,E,D>   {
         table.getColumns().addAll(fisrtColumn,secondColumn,thirdColumn);
 
     }
+
+
+    protected void showTableViewInt(TableView<Data>  table, String fTable,String sTable, String fname, String sname,Data d){
+        table.getColumns().clear();
+        ObservableList<Data> data= FXCollections.observableArrayList();
+        TableColumn fisrtColumn=new TableColumn(fname);
+        fisrtColumn.setMinWidth(200);
+
+        fisrtColumn.setCellValueFactory(
+                new PropertyValueFactory<Data,K>(fTable));
+
+        TableColumn secondColumn=new TableColumn(sname);
+        secondColumn.setCellValueFactory(
+                new PropertyValueFactory<Data,E>(sTable));
+
+
+        try{
+            while(r.next()){
+                data.add(d.createData(r.getString(fname),r.getInt(sname)));
+                //System.out.println(r.getString(fname)+" "+ r.getInt(sname));
+            }
+        }
+        catch (Exception e){
+
+            System.out.println(e);
+        }
+
+        table.getColumns().addAll(fisrtColumn,secondColumn);
+        table.setItems(data);
+
+    }
+
 
 }

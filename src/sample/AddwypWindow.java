@@ -6,8 +6,10 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,7 +40,7 @@ public class AddwypWindow extends AddToScroll {
         Button saershPerson = new Button("szukaj");
 
 
-
+        secondPane.setStyle("-fx-background-color: #9bbcff;");
         newWindow.setX(100);
         newWindow.setY(100);
         newWindow.setScene(secondScene);
@@ -63,7 +65,7 @@ public class AddwypWindow extends AddToScroll {
         saershPerson.setLayoutX(330);
         saershPerson.setLayoutY(300);
 
-        showTableView(persons,"firstName","secondName","imie","nazwisko",new Borrows());
+       // showTableView(persons,"firstName","secondName","imie","nazwisko",new Borrows());
         secondPane.getChildren().addAll(nameTextField, snameTextField, saershPerson,persons,showBooks,hideBooks);
 
 
@@ -75,7 +77,7 @@ public class AddwypWindow extends AddToScroll {
                 r = baseData.getData("Select imie, nazwisko from osoby where imie='" + nameTextField.getText() + "' or nazwisko='" + snameTextField.getText() + "';");
             }
 
-            showTableView(persons,"firstName","secondName","imie","nazwisko",new Borrows());
+            showTableView(persons,"fName","sName","imie","nazwisko",new Person());
 
                 Button add = new Button("dodaj");
                 Button saershBooks = new Button("szukaj");
@@ -94,7 +96,7 @@ public class AddwypWindow extends AddToScroll {
                         nameTextField.setLayoutX(630);
                         nameTextField.setPromptText("Tytuł");
                         books.setLayoutX(300);
-                        showTableView(books,"title","tytul",new Borrows());
+                        showTableView(books,"title","ilosc","tytul","ilosc",new Person());
                         secondPane.getChildren().add(books);
                         secondPane.getChildren().addAll(saershBooks, add);
                     }else{
@@ -107,17 +109,38 @@ public class AddwypWindow extends AddToScroll {
 
 
                 saershBooks.setOnAction( event2 -> {
+
                     if (nameTextField.getText().trim().isEmpty()) {
-                        r = baseData.getData("Select tytul from ksiazki");
+                        r = baseData.getData("Select tytul, ilosc from ksiazki");
                     } else {
-                        r = baseData.getData("Select  tytul from ksiazki where tytul='" + nameTextField.getText() + "';");
+                        r = baseData.getData("Select  tytul, ilosc from ksiazki where tytul='" + nameTextField.getText() + "';");
                     }
 
-                    showTableView(books,"title","tytul", new Borrows());
+                    showTableViewInt(books,"fName","id","tytul","ilosc", new Person());
 
                     });
 
                      books.setOnMouseClicked(event -> {
+                         ObservableList<Person> bo=books.getSelectionModel().getSelectedItems();
+                         bo.forEach(borrows -> {
+                             if(borrows.getId()<=0){
+                                 Stage win=new Stage();
+                                 Pane pane=new Pane();
+                                 Scene scene=new Scene(pane,100,100);
+                                 Label label=new Label("Brak danego tytułu !!");
+                                 Button ok=new Button("OK");
+                                 ok.setLayoutY(25);
+                                 pane.getChildren().addAll(label,ok);
+                                 win.setScene(scene);
+                                 win.show();
+
+                                 ok.setOnAction(event1->{
+                                     win.close();
+                                 });
+                                 add.setDisable(true);
+                                 books.getSelectionModel().clearSelection();
+                             }
+                         });
                          if(!books.getSelectionModel().isEmpty()){
                              add.setDisable(false);
                          }else{
@@ -129,15 +152,15 @@ public class AddwypWindow extends AddToScroll {
                          if(!books.getSelectionModel().isEmpty() && !persons.getSelectionModel().isEmpty()){
 
 
-                             ObservableList<Borrows> people=persons.getSelectionModel().getSelectedItems();
-                             ObservableList<Borrows> boks=books.getSelectionModel().getSelectedItems();
+                             ObservableList<Person> people=persons.getSelectionModel().getSelectedItems();
+                             ObservableList<Person> boks=books.getSelectionModel().getSelectedItems();
 
-                             for (Borrows p:people) {
+                             for (Person p:people) {
 
                                  StringBuilder query=new StringBuilder("Select id_o from osoby where nazwisko='");
-                                 query.append(p.getSecondName());
+                                 query.append(p.getsName());
                                  query.append("' and imie='");
-                                 query.append(p.getFirstName()+"'");
+                                 query.append(p.getfName()+"'");
                                  r=baseData.getData(query.toString());
                                  int idO=-1;
                                  int idB=-1;
@@ -148,11 +171,11 @@ public class AddwypWindow extends AddToScroll {
                                      e.printStackTrace();
                                  }
 
-                                 for (Borrows b:boks) {
+                                 for (Person b:boks) {
 
 
                                      query=new StringBuilder("Select id from ksiazki where tytul='");
-                                     query.append(b.getTitle()+"'");
+                                     query.append(b.getfName()+"'");
                                      r=baseData.getData(query.toString());
 
                                      try {
@@ -165,7 +188,7 @@ public class AddwypWindow extends AddToScroll {
                                      if(idO>-1 && idB>-1)
                                      baseData.inserInto("insert into wypozyczenia (id_ksiazki, id_osoby) values(?, ?);",idB,idO);
 
-                                     secondScene.getWindow().hide();
+                                     newWindow.close();
                                  }
                              }
                          }

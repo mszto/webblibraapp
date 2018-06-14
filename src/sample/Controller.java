@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import java.sql.SQLException;
@@ -36,7 +37,6 @@ public class Controller extends AddToScroll {
         Button deleteButton = new Button("usun");
         Button addButton = new Button("Dodaj");
 
-
         tablePerson.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         mainPane.getChildren().removeAll();
@@ -46,31 +46,46 @@ public class Controller extends AddToScroll {
         mainPane.getChildren().add(title);
         mainPane.getChildren().add(deleteButton);
         mainPane.getChildren().add(addButton);
-        mainPane.getChildren().addAll(tablePerson,os,wypoz,showBooksButton);
 
-        tablePerson.setMinSize(400, 900);
+        Label nameLabel =new Label("imię:");
+        Label sNameLabel =new Label("Nazwisko:");
+        Label titleLabel =new Label("Tytuł:");
+        mainPane.getChildren().addAll(tablePerson,os,wypoz,showBooksButton,nameLabel,sNameLabel,titleLabel);
+
+
+        tablePerson.setMinSize(400, 600);
         tablePerson.setLayoutY(50);
 
         sName.setPromptText("nazwisko");
-        sName.setLayoutY(240);
+        sName.setLayoutY(250);
         sName.setLayoutX(500);
+        sNameLabel.setLayoutX(500);
+        sNameLabel.setLayoutY(230);
 
         name.setPromptText("imie");
         name.setLayoutX(500);
         name.setLayoutY(200);
 
+        nameLabel.setLayoutX(500);
+        nameLabel.setLayoutY(180);
+
+        titleLabel.setLayoutX(500);
+        titleLabel.setLayoutY(290);
+
         title.setPromptText("tytuł");
         title.setLayoutX(500);
-        title.setLayoutY(280);
+        title.setLayoutY(310);
 
-        searchButoon.setLayoutX(750);
-        searchButoon.setLayoutY(200);
+        searchButoon.setLayoutX(500);
+        searchButoon.setLayoutY(400);
 
         addButton.setLayoutX(500);
         addButton.setLayoutY(100);
 
         deleteButton.setLayoutY(100);
         deleteButton.setLayoutX(450);
+
+        deleteButton.setDisable(true);
         showTableView(tablePerson, "firstName", "secondName", "title", "imie", "nazwisko", "tytul",new Borrows());
 
 
@@ -92,6 +107,14 @@ public class Controller extends AddToScroll {
 
         });
 
+        tablePerson.setOnMouseClicked(clikedTable->{
+            if(tablePerson.getSelectionModel().isEmpty()) {
+                deleteButton.setDisable(true);
+            }else{
+                deleteButton.setDisable(false);
+            }
+        });
+
         deleteButton.setOnAction(event1 -> {
             ObservableList<Borrows> list;
             list = tablePerson.getSelectionModel().getSelectedItems();
@@ -105,6 +128,7 @@ public class Controller extends AddToScroll {
             }
 
         });
+
 
 
         addButton.setOnAction((ActionEvent event1) -> {
@@ -140,6 +164,7 @@ public class Controller extends AddToScroll {
 
         addsName.setPromptText("nazwisko");
         addsName.setLayoutY(600);
+        addName.prefHeightProperty().bind(mainPane.heightProperty());
 
 
         addName.setPromptText("imie");
@@ -223,6 +248,7 @@ public class Controller extends AddToScroll {
 
         TextField title = new TextField();
         TextField addTitle= new TextField();
+        TextField addHowMuch= new TextField();
 
         Button searchBook=new Button("Szukaj");
         Button addBook= new Button("Dodaj");
@@ -236,6 +262,9 @@ public class Controller extends AddToScroll {
         addTitle.setLayoutX(200);
         addTitle.setLayoutY(600);
 
+        addHowMuch.setLayoutY(600);
+        addHowMuch.setPromptText("ilosc");
+
         addBook.setLayoutY(600);
         addBook.setLayoutX(400);
 
@@ -248,22 +277,24 @@ public class Controller extends AddToScroll {
 
 
 
-        showTableViewEdit(booksTable,"fName","sName","id","tytuł","autor","id_ksiazki",new Person());
+        showTableView(booksTable,"fName","sName","ilość","tytul","autor","ilosc",new Person());
 
 
-        mainPane.getChildren().addAll(booksTable,title,searchBook,addBook,addTitle);
+        mainPane.getChildren().addAll(booksTable,title,searchBook,addBook,addTitle,addHowMuch);
         searchBook.setOnAction((ActionEvent event1) -> {
             if (title.getText().trim().isEmpty()) {
-                r = baseData.getData("Select k.tytul, k.id as id_ksiazki, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a where k.id_autor=a.id_autor ");
+                r = baseData.getData("Select k.tytul, k.ilosc as ilosc, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a  on k.id_autor=a.id_autor ");
             } else {
-                r = baseData.getData("Select k.tytul, k.id as id_ksiazki, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a where k.id_autor=a.id_autor where imie='" + title.getText() + "'");
+                r = baseData.getData("Select k.tytul, k.ilosc as ilosc, Concat(a.imie,' ',a.nazwisko) as autor from ksiazki k join autorzy a on k.id_autor=a.id_autor where k.tytul='" + title.getText() + "'");
             }
 
-            showTableView(booksTable,"fName","sName","id","tytul","autor","id_ksiazki",new Person());
+            showTableView(booksTable,"fName","sName","id","tytul","autor","ilosc",new Person());
 
     });
         addBook.setOnAction((ActionEvent a)->{
-            Authors authors=new Authors(addTitle.getText(),booksTable);
+            String text=addHowMuch.getText();
+            int i=Integer.parseInt(text);
+            Authors authors=new Authors(addTitle.getText(),i,booksTable);
         });
     }
 }
